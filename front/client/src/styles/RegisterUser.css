@@ -1,0 +1,87 @@
+@font-face {
+    font-family: 'Poppins';
+    src: url('@/assets/fonts/Poppins-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'PoppinsBold';
+    src: url('@/assets/fonts/Poppins-Bold.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+
+.signup-container {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #e8f0f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  h2 {
+    text-align: center;
+    margin-bottom: 24px;
+    font-family: 'PoppinsBold';
+  }
+  
+  .input-group {
+    margin-bottom: 20px;
+  }
+  
+  label {
+    display: block;
+    font-weight: bold;
+    font-family: 'Poppins';
+  }
+  
+  input {
+    width: 100%; 
+    padding: 10px;
+    margin-bottom: 15px; 
+    border: 1px solid #ccc; 
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+  
+  button.signup-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #4a95be;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 20px;
+    font-family: 'PoppinsBold';
+  }
+  
+  button.signup-btn:hover {
+    background-color: #4a95be;
+  }
+  
+  .error-message {
+    color: rgb(235, 99, 224);
+    text-align: center;
+    margin-top: 10px;
+    font-family: 'Poppins';
+  }
+  
+  .login-link {
+    text-align: center;
+    margin-top: 20px;
+    font-family: 'Poppins';
+  }
+  
+  .login-link a {
+    color: #4a95be;
+    text-decoration: none;
+  }
+  
+  .login-link a:hover {
+    text-decoration: underline;
+  }
+  
