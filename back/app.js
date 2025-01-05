@@ -15,6 +15,16 @@ app.get('/', (req, res) => {
   res.send('MOVIE APP!');
 });
 
+app.post('/register', (req, res) =>{
+  console.log('Cerere primită:', req.body);
+  res.send(`user ${req.body.email} registered`);
+})
+
+app.get('/register', (req, res) => {
+  res.send('cerere postman');
+});
+
+
 app.listen(port, () => {
   console.log(`Serverul rulează la http://localhost:${port}`);
 });
