@@ -15,7 +15,7 @@
         <div class="input-group">
           <label for="lastName">Last Name:</label>
           <input
-            type="lastName"
+            type="text"
             id="lastName"
             v-model="lastName"
             placeholder="Enter your last name"
@@ -62,6 +62,13 @@
   </template>
   
   <script>
+
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import {auth} from '../firebaseConfig';
+import {getFirestore, doc, setDoc} from 'firebase/firestore';
+
+const db = getFirestore();
+
   export default {
     data(){
         return {
@@ -72,11 +79,39 @@
             confirmPassword: '',
             errorMessage: '',
     };
-    }
-  }
+    },
+    methods: {
+        async signUp() {
+         if (this.password !== this.confirmPassword) {
+            this.errorMessage = 'Passwords do not match!';
+         return;
+      }
+
+      try {
+        // Înregistrează utilizatorul cu email și parolă
+        const userCredential = await createUserWithEmailAndPassword(auth, this.email, this.password);
+        const user = userCredential.user;
+
+        // Salvarea informațiilor suplimentare în Firestore
+        await setDoc(doc(db, 'users', user.uid), {
+         firstName: this.firstName,
+         lastName: this.lastName,
+         email: this.email,
+        });  
+        console.log('User registered:', userCredential.user);
+        
+        // Poți redirecționa utilizatorul după înregistrare
+        this.$router.push('/home');
+      } catch (error) {
+        this.errorMessage = error.message; // Afișează mesajul de eroare
+        console.error('Error registering user:', error);
+      }
+    },
+    },
+  };
   </script>
   
-  <!-- Add "scoped" attribute to limit CSS to this component only -->
+
   <style src="@/styles/RegisterUser.css">
   
   </style>
