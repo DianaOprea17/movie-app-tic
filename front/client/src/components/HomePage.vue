@@ -15,7 +15,7 @@
         <div>
           <label for="movieGenre">Genre:</label>
           <select id="movieGenre" v-model="newMovie.genre" required>
-            <option value="" disabled selected>Select a genre</option> <!-- Opțiune default -->
+            <option value="" disabled selected>Select a genre</option>
             <option value="Action">Action</option>
             <option value="Animation">Animation</option>
             <option value="Comedy">Comedy</option>
@@ -58,6 +58,11 @@
 <script>
 import { signOut } from "firebase/auth";
 import {auth} from '../firebaseConfig';
+import { getFirestore, collection, addDoc } from "firebase/firestore";
+import{ ref, uploadBytes, getDownloadURL} from "firebase/storage";
+import { storage } from "../firebaseConfig";
+
+const db = getFirestore();
 
 export default {
   name: 'HomePage',
@@ -91,19 +96,45 @@ export default {
   handleImageUpload(event) {
       const file = event.target.files[0];
       if (file) {
-        // Creăm un URL temporar pentru a previzualiza imaginea
+        
         this.imagePreview = URL.createObjectURL(file);
-        this.newMovie.image = file; // Salvăm fișierul selectat
+        this.newMovie.poster = file; 
+        console.log('Poster uploaded:', this.newMovie.poster);
+      }else {
+        console.error('No file selected or invalid file.');
       }
     },
-  addMovie(){
-    console.log('Movie added: ', this.newMovie);
+  async addMovie(){
+    try {
+        if (!this.newMovie.poster || !(this.newMovie.poster instanceof File)) {
+          alert("Please upload a valid movie poster.");
+          return;
+        }
 
-    this.newMovie = { title: '', genre: '', date: '', image: null }; // Resetăm formularul după trimitere
-    this.imagePreview = null;
-    this.isFormVisible = false;
+        const posterRef = ref(storage, `posters/${this.newMovie.poster.name}`);
+        await uploadBytes(posterRef, this.newMovie.poster);
+        const posterURL = await getDownloadURL(posterRef);
+
+        const user = auth.currentUser;
+        await addDoc(collection(db, "movies"), {
+          title: this.newMovie.title,
+          genre: this.newMovie.genre,
+          date: this.newMovie.date,
+          score: this.newMovie.score,
+          posterURL,
+          userEmail: user.email,
+        });
+
+        console.log('Movie added successfully');
+        this.newMovie = { title: '', genre: '', date: '', score: '', poster: null };
+        this.imagePreview = null;
+        this.isFormVisible = false;
+      } catch (error) {
+        console.error("Error adding movie: ", error);
+      }
+    
+    }
   }
-}
 };
 </script>
 
