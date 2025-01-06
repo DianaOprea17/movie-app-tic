@@ -33,6 +33,8 @@
 
    
 <script>
+import { signInWithEmailAndPassword, getIdToken } from 'firebase/auth';
+import { auth } from '@/firebaseConfig';
 
 export default {
   data(){
@@ -45,18 +47,19 @@ export default {
   methods: {
   async login() {
     try {
-      // Autentifică utilizatorul cu email și parolă folosind Firebase
-     // await signInWithEmailAndPassword(auth, this.email, this.password);
-     // console.log('User logged in');
+      //autentifica utilizatorul 
+      await signInWithEmailAndPassword(auth, this.email, this.password);
+      console.log('User logged in');
 
-      // Obține token-ul ID de la Firebase
-      //const token = await getIdToken(auth.currentUser);
+      //obtine token-ul ID de la firebase
+      const token = await getIdToken(auth.currentUser);
 
-      // Trimite token-ul la backend pentru autentificare
+      //trimite token-ul la backend pentru autentificare
       const response = await fetch('http://localhost:3000/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({ email: this.email, password: this.password }), 
       });
@@ -71,8 +74,12 @@ export default {
       }
 
     } catch (error) {
-      console.error('Error logging in: ', error);
-      this.errorMessage = 'Error logging in. Please try again.';
+      console.error("Error details:", error);
+      if (error.code === 'auth/invalid-credential') {
+          this.errorMessage = 'Invalid user. Please check you email and password again.';
+        }  else {
+          this.errorMessage = 'Error logging in. Please try again.';
+        }
     }
   }
 }

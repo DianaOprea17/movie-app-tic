@@ -5,8 +5,8 @@ import HomePage from '@/components/HomePage.vue';
 
 const routes = [
     { path: '/register', component: RegisterUser },
-    { path: '/login', component: LoginUser },
-    { path: '/home', component: HomePage },
+    { path: '/', component: LoginUser },
+    { path: '/home', component: HomePage},
   ];
   
   const router = createRouter({
@@ -14,4 +14,6 @@ const routes = [
     routes,
   });
   
+ 
+
   export default router;

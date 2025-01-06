@@ -56,7 +56,7 @@
         <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
       </form>
       <p class="login-link">
-        Already have an account? <router-link to="/login">Log in</router-link>
+        Already have an account? <router-link to="/">Log in</router-link>
       </p>
     </div>
   </template>
