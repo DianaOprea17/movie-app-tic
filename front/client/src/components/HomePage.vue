@@ -1,6 +1,6 @@
 <template>
     <div>
-      <h1>Your Movie List</h1>
+      <h1>{{ username ? `${username}'s Movie List` : "Your Movie List" }}</h1>
       <button type = button v-on:click="signoutuser" class="btn-up"> Sign out</button>
       <button @click="toggleForm" class="btn-up">Add New Movie</button>
 
@@ -58,7 +58,7 @@
 <script>
 import { signOut } from "firebase/auth";
 import {auth} from '../firebaseConfig';
-import { getFirestore, collection, addDoc } from "firebase/firestore";
+import { getFirestore, collection, addDoc} from "firebase/firestore";
 import{ ref, uploadBytes, getDownloadURL} from "firebase/storage";
 import { storage } from "../firebaseConfig";
 
@@ -77,8 +77,16 @@ export default {
         poster: null,
       },
       imagePreview: null,
+      username: null,
     };
   },
+
+  created(){
+    
+    this.fetchUserName();
+
+  },
+
   methods: {
   async signoutuser() {
     console.log("Sign out button clicked");
@@ -104,6 +112,21 @@ export default {
         console.error('No file selected or invalid file.');
       }
     },
+
+    fetchUserName() {
+      const user = auth.currentUser;
+
+     if (user) {
+         fetch(`http://localhost:3000/user/${user.uid}`).then(response => response.json())
+            .then(data => {
+               console.log('User data fetched:', data);
+               this.username = data.firstName;
+             }).catch(error => {
+                console.error('Error fetching user:', error);
+                });
+  }
+    },
+
   async addMovie(){
     try {
         if (!this.newMovie.poster || !(this.newMovie.poster instanceof File)) {

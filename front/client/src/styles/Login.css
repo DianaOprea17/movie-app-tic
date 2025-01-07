@@ -60,7 +60,8 @@
   }
   
   button.login-btn:hover {
-    background-color: #4a95be;
+    background-color: #9cc4e7;
+    color: #00335f;
   }
   
   .error-message {
