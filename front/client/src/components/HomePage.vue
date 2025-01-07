@@ -57,6 +57,7 @@
 
 <script>
 import { signOut } from "firebase/auth";
+import { onAuthStateChanged } from "firebase/auth";
 import {auth} from '../firebaseConfig';
 import { getFirestore, collection, addDoc} from "firebase/firestore";
 import{ ref, uploadBytes, getDownloadURL} from "firebase/storage";
@@ -83,7 +84,16 @@ export default {
 
   created(){
     
-    this.fetchUserName();
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        this.username = user.email; // Sau alte informații despre utilizator
+        this.fetchUserName(user.uid);
+        console.log("User logged in:", user.email);
+      } else {
+        console.log("No user logged in");
+        this.$router.push('/'); // Redirecționare la pagina de login
+      }
+    });
 
   },
 
