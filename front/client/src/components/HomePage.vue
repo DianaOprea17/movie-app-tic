@@ -59,7 +59,7 @@
 import { signOut } from "firebase/auth";
 import { onAuthStateChanged } from "firebase/auth";
 import {auth} from '../firebaseConfig';
-import { getFirestore, collection, addDoc} from "firebase/firestore";
+import { getFirestore, collection, addDoc, serverTimestamp} from "firebase/firestore";
 import{ ref, uploadBytes, getDownloadURL} from "firebase/storage";
 import { storage } from "../firebaseConfig";
 
@@ -86,12 +86,12 @@ export default {
     
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        this.username = user.email; // Sau alte informații despre utilizator
+        this.username = user.email; 
         this.fetchUserName(user.uid);
         console.log("User logged in:", user.email);
       } else {
         console.log("No user logged in");
-        this.$router.push('/'); // Redirecționare la pagina de login
+        this.$router.push('/'); 
       }
     });
 
@@ -144,18 +144,28 @@ export default {
           return;
         }
 
+         //upload poster in storage
         const posterRef = ref(storage, `posters/${this.newMovie.poster.name}`);
         await uploadBytes(posterRef, this.newMovie.poster);
         const posterURL = await getDownloadURL(posterRef);
 
         const user = auth.currentUser;
+
         await addDoc(collection(db, "movies"), {
           title: this.newMovie.title,
-          genre: this.newMovie.genre,
+          genre: this.newMovie.genre ,
           date: this.newMovie.date,
-          score: this.newMovie.score,
+          score: parseFloat(this.newMovie.score),
           posterURL,
-          userEmail: user.email,
+          user: {
+            uid: user.uid,
+            email: user.email,
+            
+          },
+          metadata: {
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+          },
         });
 
         console.log('Movie added successfully');
