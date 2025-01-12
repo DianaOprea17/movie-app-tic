@@ -50,6 +50,15 @@
         </form>
        </div>
 
+       <div v-if="movies.length >0">
+      <h2>Movies: </h2>
+      <ul>
+        <li v-for="movie in movies" :key="movie.id">
+          <strong>{{ movie.title }}</strong> - {{ movie.score }}
+        </li>
+      </ul>
+
+    </div>
     </div>
 
 
@@ -69,6 +78,7 @@ export default {
   name: 'HomePage',
   data(){
     return{
+      movies: [],
       isFormVisible: false,
       newMovie:{
         title: '',
@@ -83,7 +93,7 @@ export default {
   },
 
   created(){
-    
+    this.displayMovies();
     onAuthStateChanged(auth, (user) => {
       if (user) {
         this.username = user.email; 
@@ -176,6 +186,18 @@ export default {
         console.error("Error adding movie: ", error);
       }
     
+    },
+    async displayMovies(){
+      try{
+        const response = await fetch('http://localhost:3000/movies');
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+       const movies = await response.json();
+       this.movies = movies;
+      } catch(error){
+        console.error("Error displaying movies: ", error);
+      }
     }
   }
 };

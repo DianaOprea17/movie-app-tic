@@ -123,6 +123,20 @@ app.post('/login', async (req, res) => {
   }
 });
 
+app.get('/movies', async (req, res) => {
+  try {
+    const snapshot = await db.collection('movies').get();
+    const movies = snapshot.docs.map(doc => ({
+      id: doc.id,
+      title: doc.data().title,
+      score: doc.data().score,
+    }));
+    res.status(200).json(movies);
+  } catch (error) {
+    console.error("Error fetching movies:", error);
+    res.status(500).send('Error retrieving movies');
+  }
+});
 
 app.get('/register', (req, res) => {
   res.send('cerere postman');
