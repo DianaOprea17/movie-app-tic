@@ -129,7 +129,10 @@ app.get('/movies', async (req, res) => {
     const movies = snapshot.docs.map(doc => ({
       id: doc.id,
       title: doc.data().title,
+      genre: doc.data().genre,
+      date: doc.data().date,
       score: doc.data().score,
+      posterURL: doc.data().posterURL,
     }));
     res.status(200).json(movies);
   } catch (error) {

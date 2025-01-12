@@ -1,5 +1,6 @@
 <template>
     <div>
+      <div class="container">
       <h1>{{ username ? `${username}'s Movie List` : "Your Movie List" }}</h1>
       <button type = button v-on:click="signoutuser" class="btn-up"> Sign out</button>
       <button @click="toggleForm" class="btn-up">Add New Movie</button>
@@ -49,19 +50,46 @@
         <button type="submit" class="btn-form">Add Movie</button>
         </form>
        </div>
-
-       <div v-if="movies.length >0">
-      <h2>Movies: </h2>
-      <ul>
-        <li v-for="movie in movies" :key="movie.id">
-          <strong>{{ movie.title }}</strong> - {{ movie.score }}
-        </li>
-      </ul>
-
-    </div>
+    
     </div>
 
+    <div v-if="movies.length >0">
+     
+      <div class="movie-list">
+        <div v-for="movie in movies" :key="movie.id" class="movie-item" @click="showMovieDetails(movie)">
+          
+          <img 
+          :src="movie.posterURL" 
+          :alt="movie.title"
+          class="movie-poster"
+        />
+        <div class="movie-details">
+          <strong>{{ movie.title }}</strong><br/>
+          
+        </div>
+        </div>
 
+      </div>
+    </div>
+
+    <div v-if="selectedMovie" class="modal-overlay" @click="closeModal">
+      <div class="modal-content" @click.stop>
+        <button class="close-button" @click="closeModal">&times;</button>
+        <div class="modal-body">
+          <img :src="selectedMovie.posterURL" :alt="selectedMovie.title" class="modal-poster"/>
+          <div class="modal-info">
+            <h2>{{ selectedMovie.title }}</h2>
+            <p><strong>Genre:</strong> {{ selectedMovie.genre || 'Not specified' }}</p>
+            <p><strong>Date Added:</strong> {{ formatDate(selectedMovie.date) }}</p>
+            <p><strong>Score:</strong> {{ selectedMovie.score }}/10</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+    
   </template>
 
 <script>
@@ -89,6 +117,7 @@ export default {
       },
       imagePreview: null,
       username: null,
+      selectedMovie: null,
     };
   },
 
@@ -194,10 +223,30 @@ export default {
           throw new Error('Network response was not ok');
         }
        const movies = await response.json();
-       this.movies = movies;
+       this.movies = movies.map(movie => ({
+      ...movie,
+      posterURL: movie.posterURL 
+    }));
       } catch(error){
         console.error("Error displaying movies: ", error);
       }
+    },
+
+    showMovieDetails(movie){
+      this.selectedMovie = movie;
+    },
+    closeModal(){
+      this.selectedMovie = null;
+    },
+    formatDate(date){
+      if (!date) return 'No date available';
+      try {
+        const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
+        //'en-GB' este pentru zi/luna/an
+        return new Date(date).toLocaleDateString('en-GB', options); 
+    } catch (error) {
+      return 'Invalid Date';
+    }
     }
   }
 };

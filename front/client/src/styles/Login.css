@@ -30,6 +30,7 @@
   
   .input-group {
     margin-bottom: 20px;
+    background-color: #e8f0f9;
   }
   
   label {
@@ -85,5 +86,6 @@
     text-decoration: underline;
   }
 
-
-  
+  .form{
+    background-color: #e8f0f9;
+  }

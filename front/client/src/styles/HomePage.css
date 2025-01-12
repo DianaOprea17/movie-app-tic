@@ -19,11 +19,24 @@
     font-style: normal;
 }
 
+html,
+body {
+  margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100vh;
+}
+
+#app {
+  width: 100%;
+  min-height: 100vh;
+}
+
 h1{
     font-family: "PoppinsBold";
 }
 
-div {
+.container {
     margin: 20px auto; 
     width: 80%; 
     max-width: 600px; 
@@ -112,3 +125,121 @@ div {
   option {
     padding: 10px;
   }
+
+  .movie-list {
+    display: flex;
+    justify-content: flex-start;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin: 0 auto;
+    padding: 0 20px;
+    width: 100%;
+    max-width: 1200px;
+    margin-top: 70px;
+  }
+  
+  .movie-item {
+    cursor: pointer;
+    flex: 1 0 21%;  
+    text-align: center;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 8px;
+    box-sizing: border-box;
+    min-width: 200px;
+    max-width: 300px;
+    background-color: #9cc4e7;
+    transition: transform 0.2s;
+    overflow: hidden;
+  }
+
+  .movie-poster {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-bottom: 10px;
+  }
+
+  .movie-details {
+    display: block;
+    padding: 5px;
+    font-family: 'PoppinsBold';
+    color: #011c3e;
+    font-size: 20px;
+  }
+
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 800px;
+    width: 90%;
+    position: relative;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  
+  .close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    width: auto;
+    padding: 5px 10px;
+    color: #00335f;
+  }
+  
+  .close-button:hover {
+    color: #397fbd;
+  }
+  
+  .modal-body {
+    display: flex;
+    gap: 20px;
+    padding: 20px 0;
+  }
+  
+  .modal-poster {
+    width: 300px;
+    height: 450px;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+  
+  .modal-info {
+    flex: 1;
+    text-align: left;
+  }
+  
+  .modal-info h2 {
+    color: #00335f;
+    font-family: "PoppinsBold";
+    margin-bottom: 20px;
+  }
+  
+  .modal-info p {
+    margin: 10px 0;
+    font-family: "Poppins";
+    font-size: 16px;
+  }
+
+  
+  
+  
