@@ -141,6 +141,18 @@ app.get('/movies', async (req, res) => {
   }
 });
 
+/*app.delete("/movies/:id", async (req, res) => {
+  const movieId = req.params.id;
+  console.log("Deleting movie with ID:", movieId);
+  try {
+    await db.collection("movies").doc(movieId).delete();
+    res.status(200).json({ message: "Movie deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting movie:", error);
+    res.status(500).json({ error: "Failed to delete movie" });
+  }
+});*/
+
 app.get('/register', (req, res) => {
   res.send('cerere postman');
 });

@@ -1,7 +1,9 @@
 <template>
     <div class="login-container">
+      <div class="login-form">
       <h2>Log in</h2>
       <form v-on:submit.prevent="login">
+        <div class="form-content">
         <div class="input-group">
           <label for="email">Email:</label>
           <input
@@ -24,10 +26,12 @@
         </div>
         <button type="submit" class="login-btn">Log in</button>
         <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
+      </div>
       </form>
       <p class="signup-link">
         Don't have an account? <router-link to="/register">Sign up</router-link>
       </p>
+    </div>
     </div>
   </template>
 

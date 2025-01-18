@@ -78,10 +78,26 @@
         <div class="modal-body">
           <img :src="selectedMovie.posterURL" :alt="selectedMovie.title" class="modal-poster"/>
           <div class="modal-info">
-            <h2>{{ selectedMovie.title }}</h2>
-            <p><strong>Genre:</strong> {{ selectedMovie.genre || 'Not specified' }}</p>
-            <p><strong>Date Added:</strong> {{ formatDate(selectedMovie.date) }}</p>
-            <p><strong>Score:</strong> {{ selectedMovie.score }}/10</p>
+
+            <h2 v-if="!isEditing">{{ selectedMovie.title }}</h2>
+            <input v-else type="text" v-model="editedMovie.title" />
+
+           <p v-if="!isEditing"><strong>Genre:</strong> {{ selectedMovie.genre }}</p>
+            <select v-else v-model="editedMovie.genre">
+              <option value="Action">Action</option>
+              <option value="Comedy">Comedy</option>
+              <option value="Drama">Drama</option>
+            </select>
+
+             <p v-if="!isEditing"><strong>Date seen:</strong> {{ formatDate(selectedMovie.date) }}</p>
+            <input v-else type="date" v-model="editedMovie.date" />
+
+            <p v-if="!isEditing"><strong>Score:</strong> {{ selectedMovie.score }}/10</p>
+            <input v-else type="number" v-model="editedMovie.score" />
+
+            <button class="edit-button" @click="editMovie">Edit</button>
+            <button class="delete-button" @click="deleteMovie">Delete</button>
+            <button v-if="isEditing" @click="saveMovieEdits">Save</button>
           </div>
         </div>
       </div>
@@ -96,7 +112,7 @@
 import { signOut } from "firebase/auth";
 import { onAuthStateChanged } from "firebase/auth";
 import {auth} from '../firebaseConfig';
-import { getFirestore, collection, addDoc, serverTimestamp} from "firebase/firestore";
+import { getFirestore, collection, addDoc, serverTimestamp, updateDoc, doc} from "firebase/firestore";
 import{ ref, uploadBytes, getDownloadURL} from "firebase/storage";
 import { storage } from "../firebaseConfig";
 
@@ -108,6 +124,8 @@ export default {
     return{
       movies: [],
       isFormVisible: false,
+      isEditing: false,
+      editedMovie: {},
       newMovie:{
         title: '',
         genre: '',
@@ -247,7 +265,33 @@ export default {
     } catch (error) {
       return 'Invalid Date';
     }
-    }
+    },
+
+    editMovie(){
+      this.isEditing = true;
+      this.editedMovie = { ...this.selectedMovie };
+    },
+
+    async saveMovieEdits() {
+  try {
+    if (!this.selectedMovie.id) return;
+
+    const movieRef = doc(db, "movies", this.selectedMovie.id);
+    await updateDoc(movieRef, {
+      title: this.editedMovie.title,
+      genre: this.editedMovie.genre,
+      date: this.editedMovie.date,
+      score: this.editedMovie.score,
+      "metadata.updatedAt": serverTimestamp(),
+    });
+
+    // Actualizăm și în interfață
+    Object.assign(this.selectedMovie, this.editedMovie);
+    this.isEditing = false;
+  } catch (error) {
+    console.error("Error updating movie:", error);
+  }
+},
   }
 };
 </script>

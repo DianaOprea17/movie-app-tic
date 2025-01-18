@@ -5,7 +5,7 @@ import {getFirestore} from 'firebase/firestore';
 import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
- apiKey: "api",
+ apiKey: "",
   authDomain: "movie-app2-7ebf5.firebaseapp.com",
   projectId: "movie-app2-7ebf5",
   storageBucket: "movie-app2-7ebf5.firebasestorage.app",
