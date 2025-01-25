@@ -39,6 +39,11 @@
         </div>
 
         <div>
+          <label for ="details">Other Details: </label>
+          <input type="text" id="details" v-model = "newMovie.details" required/>
+        </div>
+
+        <div>
           <label for="moviePoster">Movie Poster:</label>
           <input type="file" id="moviePoster" @change="handleImageUpload" accept="image/*" />
         </div>
@@ -85,8 +90,13 @@
            <p v-if="!isEditing"><strong>Genre:</strong> {{ selectedMovie.genre }}</p>
             <select v-else v-model="editedMovie.genre">
               <option value="Action">Action</option>
+              <option value="Animation">Animation</option>
               <option value="Comedy">Comedy</option>
               <option value="Drama">Drama</option>
+              <option value="Horror">Horror</option>
+              <option value="Romance">Romance</option>
+              <option value="Sci-Fi">Sci-Fi</option>
+              <option value="Thriller">Thriller</option>
             </select>
 
              <p v-if="!isEditing"><strong>Date seen:</strong> {{ formatDate(selectedMovie.date) }}</p>
@@ -94,6 +104,9 @@
 
             <p v-if="!isEditing"><strong>Score:</strong> {{ selectedMovie.score }}/10</p>
             <input v-else type="number" v-model="editedMovie.score" />
+
+            <p v-if="!isEditing"><strong>Other Details:</strong> {{ selectedMovie.details }}</p>
+            <input v-else type="text" v-model="editedMovie.details"/>
 
             <button class="edit-button" @click="editMovie">Edit</button>
             <button class="delete-button" @click="deleteMovie">Delete</button>
@@ -131,6 +144,7 @@ export default {
         genre: '',
         date: '',
         score: '',
+        details: '',
         poster: null,
       },
       imagePreview: null,
@@ -209,10 +223,14 @@ export default {
         const user = auth.currentUser;
 
         await addDoc(collection(db, "movies"), {
-          title: this.newMovie.title,
-          genre: this.newMovie.genre ,
-          date: this.newMovie.date,
-          score: parseFloat(this.newMovie.score),
+          movie:{
+            title: this.newMovie.title,
+            genre: this.newMovie.genre ,
+            date: this.newMovie.date,
+            score: parseFloat(this.newMovie.score),
+            details: this.newMovie.details
+          },
+          
           posterURL,
           user: {
             uid: user.uid,
@@ -226,9 +244,10 @@ export default {
         });
 
         console.log('Movie added successfully');
-        this.newMovie = { title: '', genre: '', date: '', score: '', poster: null };
+        this.newMovie = { title: '', genre: '', date: '', score: '', details: '', poster: null };
         this.imagePreview = null;
         this.isFormVisible = false;
+        alert("Movie added sucessfully");
       } catch (error) {
         console.error("Error adding movie: ", error);
       }
@@ -241,8 +260,11 @@ export default {
           throw new Error('Network response was not ok');
         }
        const movies = await response.json();
+       console.log("Filmele primite de la API:", movies);
+       
        this.movies = movies.map(movie => ({
-      ...movie,
+        id: movie.id,
+        ...movie,
       posterURL: movie.posterURL 
     }));
       } catch(error){
@@ -273,25 +295,72 @@ export default {
     },
 
     async saveMovieEdits() {
-  try {
-    if (!this.selectedMovie.id) return;
+     try {
+      if (!this.selectedMovie.id) return;
 
-    const movieRef = doc(db, "movies", this.selectedMovie.id);
-    await updateDoc(movieRef, {
-      title: this.editedMovie.title,
-      genre: this.editedMovie.genre,
-      date: this.editedMovie.date,
-      score: this.editedMovie.score,
-      "metadata.updatedAt": serverTimestamp(),
+      const movieRef = doc(db, "movies", this.selectedMovie.id);
+      await updateDoc(movieRef, {
+        "movie.title": this.editedMovie.title,
+        "movie.genre": this.editedMovie.genre,
+        "movie.date": this.editedMovie.date,
+        "movie.score": this.editedMovie.score,
+        "movie.details": this.editedMovie.details,
+        "metadata.updatedAt": serverTimestamp(),
+      });
+
+      Object.assign(this.selectedMovie, this.editedMovie);
+      this.isEditing = false;
+    } catch (error) {
+      console.error("Error updating movie:", error);
+    }
+   },
+
+   async deleteMovie() {
+  if (!this.selectedMovie || !this.selectedMovie.id) {
+    console.error("No movie selected or invalid movie ID");
+    return;
+  }
+
+  try {
+    // Show confirmation dialog
+    if (!confirm("Are you sure you want to delete this movie?")) {
+      return;
+    }
+
+    console.log("Attempting to delete movie with ID:", this.selectedMovie.id);
+
+    // Call the backend API to delete the movie
+    const response = await fetch(`http://localhost:3000/movies/${this.selectedMovie.id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      }
     });
 
-    // Actualizăm și în interfață
-    Object.assign(this.selectedMovie, this.editedMovie);
-    this.isEditing = false;
+    console.log("Delete response status:", response.status);
+
+    const responseData = await response.json();
+
+    if (!response.ok) {
+      // Display error message from server
+      alert(responseData.error || "Failed to delete movie");
+      return;
+    }
+
+    // Remove from local state
+    const index = this.movies.findIndex(movie => movie.id === this.selectedMovie.id);
+    if (index > -1) {
+      this.movies.splice(index, 1);
+    }
+
+    // Close the modal
+    this.closeModal();
+    console.log('Movie deleted successfully');
   } catch (error) {
-    console.error("Error updating movie:", error);
+    console.error("Error deleting movie:", error);
+    alert("Failed to delete movie. Please try again.");
   }
-},
+}
   }
 };
 </script>

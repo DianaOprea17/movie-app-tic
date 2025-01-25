@@ -26,6 +26,7 @@ app.use(morgan('combined'));
 app.use(bodyParser.json());
 app.use(cors({
   origin: 'http://localhost:8080', 
+  methods: ['GET', 'POST', 'DELETE', 'UPDATE', 'PUT', 'PATCH']
 }));
 app.use(express.json());
 
@@ -48,7 +49,7 @@ const verifyToken = async (req, res, next) => {
 
 app.post('/add-movie', upload.single('poster'), async (req, res) => {
   try {
-    const { title, genre, date, score, userEmail } = req.body;
+    const { title, genre, date, score, details, userEmail } = req.body;
     const file = req.file; 
 
     const bucket = storage.bucket();
@@ -63,10 +64,13 @@ app.post('/add-movie', upload.single('poster'), async (req, res) => {
     const fileUrl = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
 
     await db.collection('movies').add({
-      title,
-      genre,
-      date,
-      score,
+      movie: {
+        title,
+        genre,
+        date,
+        score,
+        details,
+      },
       posterURL: fileUrl,
       userEmail,
     });
@@ -128,10 +132,11 @@ app.get('/movies', async (req, res) => {
     const snapshot = await db.collection('movies').get();
     const movies = snapshot.docs.map(doc => ({
       id: doc.id,
-      title: doc.data().title,
-      genre: doc.data().genre,
-      date: doc.data().date,
-      score: doc.data().score,
+      title: doc.data().movie?.title,
+      genre: doc.data().movie?.genre,
+      date: doc.data().movie?.date,
+      score: doc.data().movie?.score,
+      details: doc.data().movie?.details, 
       posterURL: doc.data().posterURL,
     }));
     res.status(200).json(movies);
@@ -141,17 +146,60 @@ app.get('/movies', async (req, res) => {
   }
 });
 
-/*app.delete("/movies/:id", async (req, res) => {
+app.delete("/movies/:id", async (req, res) => {
   const movieId = req.params.id;
-  console.log("Deleting movie with ID:", movieId);
+  
   try {
-    await db.collection("movies").doc(movieId).delete();
-    res.status(200).json({ message: "Movie deleted successfully" });
+    const movieRef = db.collection("movies").doc(movieId);
+    const doc = await movieRef.get();
+    
+    if (!doc.exists) {
+      return res.status(404).json({ error: "Movie not found" });
+    }
+
+    const movieData = doc.data();
+    
+    if (movieData.posterURL) {
+      try {
+        const bucket = storage.bucket();
+        
+        const urlParts = movieData.posterURL.split('/');
+        const fileName = urlParts[urlParts.length - 1];
+        const filePath = `posters/${fileName}`;
+
+        console.log("Attempting to delete file:", {
+          originalURL: movieData.posterURL,
+          extractedPath: filePath
+        });
+
+        const file = bucket.file(filePath);
+        
+        const [exists] = await file.exists();
+        if (exists) {
+          await file.delete();
+          console.log(`Poster deleted: ${filePath}`);
+        } else {
+          console.warn(`Poster not found: ${filePath}`);
+        }
+      } catch (storageError) {
+        console.error("Storage Deletion Error:", storageError);
+      }
+    }
+
+
+    await movieRef.delete();
+    
+    res.status(200).json({ message: "Movie and poster deleted successfully" });
+
   } catch (error) {
-    console.error("Error deleting movie:", error);
-    res.status(500).json({ error: "Failed to delete movie" });
+    console.error("Deletion Error:", error);
+    res.status(500).json({ 
+      error: "Failed to delete movie", 
+      details: error.message 
+    });
   }
-});*/
+});
+
 
 app.get('/register', (req, res) => {
   res.send('cerere postman');
