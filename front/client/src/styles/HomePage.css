@@ -240,6 +240,14 @@ h1{
     font-size: 16px;
   }
 
-  
-  
-  
+  .search-section{
+    width: 100%;
+    text-align: center;
+    background-color: #c6dff2; 
+  }
+
+  .filter-button{
+    font-family: 'PoppinsBold';
+    cursor: pointer;
+
+  }

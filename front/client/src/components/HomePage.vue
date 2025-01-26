@@ -5,6 +5,7 @@
       <button type = button v-on:click="signoutuser" class="btn-up"> Sign out</button>
       <button @click="toggleForm" class="btn-up">Add New Movie</button>
 
+    
       <div v-if="isFormVisible" class="addmovieform">
       <h2>Add a New Movie</h2>
        <form @submit.prevent="addMovie">
@@ -58,10 +59,19 @@
     
     </div>
 
-    <div v-if="movies.length >0">
+    <form class="search-section">
+        <div>
+          <input v-model="searched" type="text" placeholder="Search" class="search-input">
+        </div>
+      </form>
+    <span @click="toggleFilter" class="filter-button">
+        Filter By
+    </span>
+
+    <div v-if="filteredMovies.length >0">
      
       <div class="movie-list">
-        <div v-for="movie in movies" :key="movie.id" class="movie-item" @click="showMovieDetails(movie)">
+        <div v-for="movie in filteredMovies" :key="movie.id" class="movie-item" @click="showMovieDetails(movie)">
           
           <img 
           :src="movie.posterURL" 
@@ -150,6 +160,8 @@ export default {
       imagePreview: null,
       username: null,
       selectedMovie: null,
+      searched: '',
+      filteredMovies:[]
     };
   },
 
@@ -267,6 +279,8 @@ export default {
         ...movie,
       posterURL: movie.posterURL 
     }));
+
+    this.filteredMovies = this.movies;
       } catch(error){
         console.error("Error displaying movies: ", error);
       }
@@ -310,58 +324,73 @@ export default {
 
       Object.assign(this.selectedMovie, this.editedMovie);
       this.isEditing = false;
-    } catch (error) {
+         } catch (error) {
       console.error("Error updating movie:", error);
-    }
-   },
+        }
+      },
 
-   async deleteMovie() {
-  if (!this.selectedMovie || !this.selectedMovie.id) {
-    console.error("No movie selected or invalid movie ID");
-    return;
-  }
-
-  try {
-    // Show confirmation dialog
-    if (!confirm("Are you sure you want to delete this movie?")) {
-      return;
-    }
-
-    console.log("Attempting to delete movie with ID:", this.selectedMovie.id);
-
-    // Call the backend API to delete the movie
-    const response = await fetch(`http://localhost:3000/movies/${this.selectedMovie.id}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
+    async deleteMovie() {
+      if (!this.selectedMovie || !this.selectedMovie.id) {
+          console.error("No movie selected or invalid movie ID");
+          return;
       }
-    });
 
-    console.log("Delete response status:", response.status);
+      try {
 
-    const responseData = await response.json();
+        if (!confirm("Are you sure you want to delete this movie?")) {
+        return;
+      }
 
-    if (!response.ok) {
-      // Display error message from server
-      alert(responseData.error || "Failed to delete movie");
-      return;
-    }
+      console.log("Attempting to delete movie with ID:", this.selectedMovie.id);
 
-    // Remove from local state
-    const index = this.movies.findIndex(movie => movie.id === this.selectedMovie.id);
-    if (index > -1) {
-      this.movies.splice(index, 1);
-    }
+      const response = await fetch(`http://localhost:3000/movies/${this.selectedMovie.id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
 
-    // Close the modal
-    this.closeModal();
-    console.log('Movie deleted successfully');
-  } catch (error) {
-    console.error("Error deleting movie:", error);
-    alert("Failed to delete movie. Please try again.");
+      console.log("Delete response status:", response.status);
+
+      const responseData = await response.json();
+
+      if (!response.ok) {
+        alert(responseData.error || "Failed to delete movie");
+        return;
+      }
+
+      const index = this.movies.findIndex(movie => movie.id === this.selectedMovie.id);
+      if (index > -1) {
+        this.movies.splice(index, 1);
+      }
+
+      this.closeModal();
+      console.log('Movie deleted successfully');
+      } catch (error) {
+        console.error("Error deleting movie:", error);
+        alert("Failed to delete movie. Please try again.");
+      }
+    },
+    
+      searching(){
+        if(!this.searched){
+          this.filteredMovies = this.movies;
+        }else{
+          const lowerCase = this.searched.toLowerCase();
+          this.filteredMovies = this.movies.filter(movie=>
+            movie.title.toLowerCase().includes(lowerCase)
+          );
+        }
+      }
+
+  },
+  watch: {
+  searched() {
+    this.searching();
   }
 }
-  }
+
+
 };
 </script>
 
