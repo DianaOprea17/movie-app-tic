@@ -1,0 +1,235 @@
+@font-face {
+    font-family: 'Poppins';
+    src: url('@/assets/fonts/Poppins-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'PoppinsBold';
+    src: url('@/assets/fonts/Poppins-Bold.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+
+
+.navbar {
+    background-color: #397fbd;
+  padding: 0 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  height: 70px;
+  min-height: 70px;
+  }
+
+  .nav-logo {
+    display: flex;
+  align-items: center;
+  height: 50px; 
+  padding: 8px 0;
+  }
+
+
+
+  .nav-links {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+  }
+
+  .nav-link {
+    color: white;
+    font-family: 'PoppinsMedium';
+    font-size: 20px;
+    align-content: center;
+    text-align: center;
+  }
+
+  .nav-btn {
+    background-color: #397fbd;
+    color: #fefefe;
+    border: none;
+    font-family: 'PoppinsMedium';
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+    width: auto;
+    text-decoration: none;
+  }
+
+
+  .nav-btn:hover {
+    background-color: #397fbd;
+    color: #c5d6e5;
+  }
+
+  .nav-title {
+    text-align: center;
+  }
+
+
+  .logo-image {
+    max-height: 100%; 
+    width: auto;
+    object-fit: contain;
+  }
+  
+  .nav-logo {
+    display: flex;
+    align-items: center;
+  }
+
+  .menu {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .menu-btn {
+    background-color: none;
+    color: white;
+    font-family: "PoppinsMedium";
+    cursor: pointer;
+    font-size: 20 px;
+ 
+  }
+
+  .menu-btn:hover{
+    background-color: #397fbd;
+    color: rgb(210, 230, 247);
+  }
+  
+  .menu-dropdown {
+    position: absolute;
+    top: 40px;
+    right: 0;
+    background-color: white;
+    min-width: 160px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    border-radius: 4px;
+    display: block;
+  }
+  
+  .menu-dropdown .nav-btn {
+    display: block;
+    width: 100%;
+    text-align: center;
+    background: none;
+    color: #333;
+    cursor: pointer;
+  }
+
+  
+  .nav-btn:hover{
+    background-color: #e9effa;
+  }
+
+  .menu-dropdown .nav-btn + .nav-btn {
+    border-top: 1px solid #eee;
+  }
+  
+
+  .close-btn-form {
+   position: relative;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    width: auto;
+    padding: 5px 10px;
+    color: #09324C;
+  }
+  
+  .close-btn-form:hover {
+    color: #397fbd;
+  }
+
+
+  /*profile*/
+
+  .profile{
+    max-width: 400px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    
+  }
+  
+  .profile-card {
+    background: white;
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: #333;
+  }
+  
+  .header {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  .info-group {
+    margin-bottom: 1rem;
+  }
+  
+  .info-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+  }
+  
+  .profile-input{
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+  }
+  
+  .profile-action {
+    margin-top: 1.5rem;
+    display: flex;
+    gap: 1rem;
+  }
+  
+  .edit-btn, .save-btn, .cancel-btn {
+    padding: 0.5rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+  }
+  
+  .edit-btn {
+    background-color: #528ec2;
+    color: white;
+  }
+  
+  .save-btn {
+    background-color: #87b9e5;
+    color: rgb(3, 27, 86);
+  }
+  
+  .cancel-btn {
+    background-color: #226fb4;
+    color: white;
+  }
+
+  .watched{
+    background-color: #5d9ed8;
+    color: #054378;
+    padding: 17px;
+    border-radius: 6px;
+    text-align: center;
+    max-width: 160px;
+    max-height: 70px;
+    font-family: "PoppinsBold";
+    border: 2px solid #054378;
+  }
+
+.container{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

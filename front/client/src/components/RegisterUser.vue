@@ -88,11 +88,10 @@ const db = getFirestore();
       }
 
       try {
-        // Înregistrează utilizatorul cu email și parolă
         const userCredential = await createUserWithEmailAndPassword(auth, this.email, this.password);
         const user = userCredential.user;
 
-        // Salvarea informațiilor suplimentare în Firestore
+        //salveaza informatiile in firestore
         await setDoc(doc(db, 'users', user.uid), {
          firstName: this.firstName,
          lastName: this.lastName,
@@ -100,10 +99,9 @@ const db = getFirestore();
         });  
         console.log('User registered:', userCredential.user);
         
-        // Poți redirecționa utilizatorul după înregistrare
         this.$router.push('/home');
       } catch (error) {
-        this.errorMessage = error.message; // Afișează mesajul de eroare
+        this.errorMessage = error.message;
         console.error('Error registering user:', error);
       }
     },

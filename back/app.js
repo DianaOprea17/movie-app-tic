@@ -86,10 +86,10 @@ app.get('/user/:uid', async (req, res) => {
   const uid = req.params.uid;
   try {
     const docRef = db.collection('users').doc(uid);
-    const docSnap = await docRef.get();
+    const docData = await docRef.get();
 
-    if (docSnap.exists) {
-      const userData = docSnap.data();
+    if (docData.exists) {
+      const userData = docData.data();
       console.log('User Data:', userData);
       res.status(200).json({
         email: userData.email,
@@ -114,12 +114,12 @@ app.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const userRecord = await admin.auth().getUserByEmail(email);
-    const idToken = await admin.auth().createCustomToken(userRecord.uid);
+    const userInfo = await admin.auth().getUserByEmail(email);
+    const idToken = await admin.auth().createCustomToken(userInfo.uid);
 
     res.status(200).json({
       token: idToken,
-      user: { uid: userRecord.uid, email: userRecord.email },
+      user: { uid: userInfo.uid, email: userInfo.email },
     });
   } catch (error) {
     console.error('Login error:', error);
@@ -129,8 +129,8 @@ app.post('/login', async (req, res) => {
 
 app.get('/movies', async (req, res) => {
   try {
-    const snapshot = await db.collection('movies').get();
-    const movies = snapshot.docs.map(doc => ({
+    const movieD = await db.collection('movies').get();
+    const movies = movieD.docs.map(doc => ({
       id: doc.id,
       title: doc.data().movie?.title,
       genre: doc.data().movie?.genre,
@@ -163,15 +163,10 @@ app.delete("/movies/:id", async (req, res) => {
       try {
         const bucket = storage.bucket();
         
-        const urlParts = movieData.posterURL.split('/');
-        const fileName = urlParts[urlParts.length - 1];
-        const filePath = `posters/${fileName}`;
-
-        console.log("Attempting to delete file:", {
-          originalURL: movieData.posterURL,
-          extractedPath: filePath
-        });
-
+        const url = movieData.posterURL;
+        const decodeURL = decodeURIComponent(url);
+        const filePath = decodeURL.split('/o/')[1].split('?')[0];
+        
         const file = bucket.file(filePath);
         
         const [exists] = await file.exists();
