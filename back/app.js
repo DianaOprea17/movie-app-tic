@@ -129,8 +129,16 @@ app.post('/login', async (req, res) => {
 
 app.get('/movies', async (req, res) => {
   try {
-    const movieD = await db.collection('movies').get();
+    const userEmail = req.query.userEmail;
+    let moviesQuery = db.collection('movies');
+
+    if(userEmail){
+      moviesQuery = moviesQuery.where('user.email','==', userEmail);
+    }
+
+    const movieD = await moviesQuery.get();
     const movies = movieD.docs.map(doc => ({
+      
       id: doc.id,
       title: doc.data().movie?.title,
       genre: doc.data().movie?.genre,
@@ -138,6 +146,7 @@ app.get('/movies', async (req, res) => {
       score: doc.data().movie?.score,
       details: doc.data().movie?.details, 
       posterURL: doc.data().posterURL,
+      
     }));
     res.status(200).json(movies);
   } catch (error) {
@@ -163,7 +172,7 @@ app.delete("/movies/:id", async (req, res) => {
       try {
         const bucket = storage.bucket();
         
-        const url = movieData.posterURL;
+        const url = new URL(movieData.posterURL);
         const decodeURL = decodeURIComponent(url);
         const filePath = decodeURL.split('/o/')[1].split('?')[0];
         

@@ -3,11 +3,14 @@ import { signOut } from 'firebase/auth';
 import { onAuthStateChanged } from 'firebase/auth';
 import {auth} from '../firebaseConfig';
 import { getFirestore, collection, addDoc, serverTimestamp, updateDoc, doc} from "firebase/firestore";
-import{ ref, uploadBytes, getDownloadURL} from 'firebase/storage';
+import{ ref, uploadBytes, getDownloadURL, deleteObject} from 'firebase/storage';
 import { storage } from '../firebaseConfig';
 import arrowUp from '../assets/up3.png';
 import arrowDown from '../assets/down3.png';
 import menuIcon from '../assets/menu-icon.png';
+//import Slider from Vue3Slider
+import Vue3Slider from 'vue3-slider';
+//import {notify} from 'vue3-notification';
 
 const db = getFirestore();
 
@@ -19,6 +22,7 @@ export default {
       arrowDown,
       arrowUp,
       menuIcon,
+      Vue3Slider,
       movies: [],
       isFormVisible: false,
       isEditing: false,
@@ -29,28 +33,30 @@ export default {
         title: '',
         genre: '',
         date: '',
-        score: '',
+        score: null,
         details: '',
         poster: null,
       },
+      currentDate: new Date().toISOString().split("T")[0], //data curenta
       imagePreview: null,
       username: null,
       selectedMovie: null,
       searched: '',
       filteredMovies:[],
-      selectedGenre:'',
       selectedFilter: '',
+     
       isFilterVisible: false,
       sortType: 'asc',
     };
   },
 
   created(){
-    this.displayMovies();
+    
     onAuthStateChanged(auth, (user) => {
       if (user) {
         this.username = user.email; 
         this.fetchUserName(user.uid);
+        this.displayMovies();
         console.log("User logged in:", user.email);
       } else {
         console.log("No user logged in");
@@ -80,13 +86,23 @@ export default {
 
   },
 
-  handleImageUpload(event) {
+  handleImageUpload(event, isEditing=false) {
       const file = event.target.files[0];
       if (file) {
+        const fileTypes = ['image/png', 'image/jpeg'];
+        if(!fileTypes.includes(file.type)){
+          alert('Please upload a PNG or JPG file.')
+        }
+
+        if(isEditing){
+          this.editedMovie.newPoster = file;
+          this.editedMovie.posterPreview  = URL.createObjectURL(file);
+        } else{
+          this.imagePreview = URL.createObjectURL(file);
+          this.newMovie.poster = file; 
+          console.log('Poster uploaded:', this.newMovie.poster);
+        }
         
-        this.imagePreview = URL.createObjectURL(file);
-        this.newMovie.poster = file; 
-        console.log('Poster uploaded:', this.newMovie.poster);
       }else {
         console.error('No file selected or invalid file.');
       }
@@ -110,6 +126,16 @@ export default {
     try {
         if (!this.newMovie.poster || !(this.newMovie.poster instanceof File)) {
           alert("Please upload a valid movie poster.");
+          return;
+        }
+
+        if(this.newMovie.score <0 || this.newMovie.score>10){
+          alert("The score must be between 0 and 10.");
+          return;
+        }
+
+        if (this.newMovie.date > this.currentDate) {
+          alert("The date introduced cannot be in the future!");
           return;
         }
 
@@ -139,7 +165,16 @@ export default {
             createdAt: serverTimestamp(),
             updatedAt: serverTimestamp(),
           },
-        });
+        }).then((docRef) => {
+           this.movies.push({
+            id: docRef.id,
+            title: this.newMovie.title,
+            genre: this.newMovie.genre,
+            date: this.newMovie.date,
+            score: parseFloat(this.newMovie.score),
+            details: this.newMovie.details,
+            posterURL: posterURL, 
+          })});
 
         console.log('Movie added successfully');
         
@@ -154,15 +189,22 @@ export default {
     
     },
 
-    //modala
     async displayMovies(){
       try{
-        const response = await fetch('http://localhost:3000/movies');
+
+        const user = auth.currentUser;
+        if(!user){
+          console.log('No user logged in');
+          return;
+        }
+
+        const response = await fetch(`http://localhost:3000/movies?userEmail=${encodeURIComponent(user.email)}`);
+
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
        const movies = await response.json();
-       console.log("Filmele primite:", movies);
+       console.log("Movies received:", movies);
        
        this.movies = movies.map(movie => ({
         id: movie.id,
@@ -170,6 +212,7 @@ export default {
       posterURL: movie.posterURL 
     }));
 
+    console.log("Processed movies:", this.movies);
     this.filteredMovies = this.movies;
       } catch(error){
         console.error("Error displaying movies: ", error);
@@ -209,6 +252,35 @@ export default {
      try {
       if (!this.selectedMovie.id) return;
 
+      let posterURL = this.selectedMovie.posterURL;
+
+      if (this.editedMovie.newPoster) {
+        
+        const oldPosterPath = decodeURIComponent(posterURL).split('/o/')[1].split('?')[0];
+        const oldPosterRef = ref(storage, oldPosterPath);
+        try {
+          await deleteObject(oldPosterRef);
+          console.log('Old poster deleted');
+        } catch (error) {
+          console.error('Error deleting old poster:', error);
+        }
+  
+        const posterRef = ref(storage, `posters/${this.editedMovie.newPoster.name}`);
+        await uploadBytes(posterRef, this.editedMovie.newPoster);
+        posterURL = await getDownloadURL(posterRef);
+
+        const movieIndex = this.movies.findIndex(m => m.id === this.selectedMovie.id);
+        if (movieIndex !== -1) {
+          this.movies[movieIndex].posterURL = posterURL;
+        }
+        
+        const filteredIndex = this.filteredMovies.findIndex(m => m.id === this.selectedMovie.id);
+        if (filteredIndex !== -1) {
+          this.filteredMovies[filteredIndex].posterURL = posterURL;
+        }
+      }
+  
+
       const movieRef = doc(db, "movies", this.selectedMovie.id);
       await updateDoc(movieRef, {
         "movie.title": this.editedMovie.title,
@@ -216,10 +288,15 @@ export default {
         "movie.date": this.editedMovie.date,
         "movie.score": this.editedMovie.score,
         "movie.details": this.editedMovie.details,
+        "posterURL": posterURL,
         "metadata.updatedAt": serverTimestamp(),
       });
 
-      Object.assign(this.selectedMovie, this.editedMovie);
+      Object.assign(this.selectedMovie, {
+      ...this.editedMovie,
+      posterURL
+    });
+
       this.isEditing = false;
          } catch (error) {
       console.error("Error updating movie:", error);
@@ -297,11 +374,11 @@ export default {
         return;
       }
 
-        if (this.selectedFilter === "genre" && this.selectedGenre) {
-            this.filteredMovies = this.movies.filter(movie => movie.genre === this.selectedGenre);
-        } else {
-        this.filteredMovies = this.movies;
-         }
+        if (this.selectedFilter) {
+            this.filteredMovies = this.movies.filter(movie => movie.genre === this.selectedFilter);
+        }
+       
+        
       },
 
       toggleMenu(event) {
@@ -336,9 +413,7 @@ export default {
        selectedFilter() {
         this.applyFilter();
       },
-      selectedGenre() {
-        this.applyFilter();
-      }
+      
   },
   mounted() {
     document.addEventListener('click', this.closeMenu);

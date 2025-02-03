@@ -13,26 +13,23 @@
 }
 
 
-
 .navbar {
     background-color: #397fbd;
-  padding: 0 2rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  height: 70px;
-  min-height: 70px;
+    padding: 0 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    height: 70px;
+    min-height: 70px;
   }
 
   .nav-logo {
     display: flex;
-  align-items: center;
-  height: 50px; 
-  padding: 8px 0;
+    align-items: center;
+    height: 50px; 
+    padding: 8px 0;
   }
-
-
 
   .nav-links {
     display: flex;
@@ -150,7 +147,7 @@
   /*profile*/
 
   .profile{
-    max-width: 400px;
+    max-width: 480px;
     margin: 2rem auto;
     padding: 0 1rem;
     
@@ -171,20 +168,23 @@
 
   .info-group {
     margin-bottom: 1rem;
+   
   }
   
   .info-group label {
     display: block;
     margin-bottom: 0.5rem;
     font-weight: 500;
+    
   }
   
   .profile-input{
     width: 100%;
-    padding: 0.5rem;
+    max-width: 600px;
     border: 1px solid #ddd;
     border-radius: 4px;
     font-size: 1rem;
+    
   }
   
   .profile-action {
@@ -193,7 +193,7 @@
     gap: 1rem;
   }
   
-  .edit-btn, .save-btn, .cancel-btn {
+  .edit-btn, .save-btn, .cancel-btn, .pass-btn {
     padding: 0.5rem 1.5rem;
     border: none;
     border-radius: 4px;
@@ -201,8 +201,13 @@
     font-weight: 500;
   }
   
+.pass-btn{
+  background-color: #528ec2;
+    color: white;
+}
+
   .edit-btn {
-    background-color: #528ec2;
+    background-color: #1d6aad;
     color: white;
   }
   
@@ -217,19 +222,57 @@
   }
 
   .watched{
-    background-color: #5d9ed8;
-    color: #054378;
+    background-color: #e2effa;
+    color: #09324C;
     padding: 17px;
     border-radius: 6px;
     text-align: center;
     max-width: 160px;
     max-height: 70px;
     font-family: "PoppinsBold";
-    border: 2px solid #054378;
+    border: 2px solid #2a85b7;
+    box-shadow: #011221;
   }
 
 .container{
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+
+.profile-b{
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: -1; 
+  background: linear-gradient(135deg, #b1d0ec, #31a0db);
+  overflow: hidden;
+
+  &::before{
+    content: "";
+    position: absolute;
+    width: 80%;
+    height: 80%;
+    background: linear-gradient(90deg, #c0edf4, #3e8db8);
+    border-radius: 50%;
+    left: -10%;
+    top: -20%;
+    filter: blur(90px);
+  }
+
+  &::after{
+    content: "";
+    position: absolute;
+    width: 80%;
+    height: 80%;
+    background: linear-gradient(90deg, #337ba2, #c5f4fb);
+    border-radius: 50%;
+    right: -10%;
+    bottom: -20%;
+    filter: blur(70px);
+
+  }
 }

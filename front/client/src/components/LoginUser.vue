@@ -1,5 +1,17 @@
 <template>
     <div class="login-container">
+
+      <div class="left-side">
+      <img :src=logo alt="Logo" class="logo" />
+      <div class="welcome-text">
+        <h1>Keep track of all the movies you've watched in one place!</h1>
+        <p>Movie Tracker helps you organize your movie collection and rate your favorites. <br>
+          Whether you're a casual viewer or a true cinephile, <br>
+          this app makes it easy to log your movie experiences.
+      </p>
+      </div>
+    </div>
+
       <div class="login-form">
       <h2>Log in</h2>
       <form v-on:submit.prevent="login">
@@ -31,21 +43,43 @@
       <p class="signup-link">
         Don't have an account? <router-link to="/register">Sign up</router-link>
       </p>
+      <p class="change-ps">
+        Forgot your password? 
+        <a class="link-change-ps" v-on:click="showResetPassword = !showResetPassword"> Click here to change it.</a>
+      </p>
+
+      <div v-if="showResetPassword" class="reset-container">
+        <div class="reset-content">
+        <button class="close-btn" v-on:click="closeForm">&times;</button>
+        <h3>Reset your password</h3>
+
+        <label for="resetEmail">Enter your email:</label>
+        <input type="email" id="resetEmail" v-model="resetEmail" placeholder="Enter your email" required />
+        <button v-on:click="resetPassword" id="reset-btn">Reset Password</button>
+        <p v-if="resetMessage" class="reset-message">{{ resetMessage }}</p>
+      </div>
     </div>
     </div>
+    </div>
+
   </template>
 
    
 <script>
-import { signInWithEmailAndPassword, getIdToken } from 'firebase/auth';
+import { signInWithEmailAndPassword, getIdToken, sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '@/firebaseConfig';
+import logo from '../assets/logoextinsalb.png';
 
 export default {
   data(){
       return {
+        logo,
           email: '',
           password: '',
           errorMessage: '',
+          showResetPassword:false,
+          resetEmail: '',
+          resetMessage: ''
   };
   },
   methods: {
@@ -85,6 +119,22 @@ export default {
           this.errorMessage = 'Error logging in. Please try again.';
         }
     }
+  },
+
+  async resetPassword(){
+    try{
+      await sendPasswordResetEmail(auth, this.resetEmail);
+      this.resetMessage = "An email has been sent for you to change the password!";
+
+    } catch(error){
+      console.error("Reset error:", error);
+      this.resetMessage = "No account found for this email address.";
+    }
+  },
+
+  closeForm(){
+    this.showResetPassword= false;
+    this.resetEmail = null;
   }
 }
 

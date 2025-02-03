@@ -1,4 +1,6 @@
 <template>
+  <div >
+    <div class="background"></div>
     <div class="homepage" >
 
       <nav class="navbar">
@@ -13,7 +15,7 @@
 
       <div class="menu">
         <button v-on:click.stop="toggleMenu" class="menu-btn"> Menu
-        <img
+     <img
         :src="menuIcon"
         :alt="menu-icon"
         class="menu-icon"
@@ -60,12 +62,12 @@
 
         <div>
           <label for="movieDate">Date:</label>
-          <input type="date" id="movieDate" v-model="newMovie.date" required />
+          <input type="date" id="movieDate" v-model="newMovie.date" :max="currentDate" required />
         </div>
 
         <div>
           <label for="movieScore">Score:</label>
-          <input type="number" id="movieScore" v-model="newMovie.score" required />
+          <input type="number" id="movieScore" v-model="newMovie.score" max="10" min="0" step="0.1" required />
         </div>
 
         <div>
@@ -100,31 +102,26 @@
           </button>
           
           <div class = "filter-wrap">
-          <button v-on:click="toggleFilter" class="filter-btn">Filter by</button>
+          <button v-on:click="toggleFilter" class="filter-btn">Filter by Genre</button>
           
           <div  v-if="isFilterVisible" class="filter-container">
             <div class="filter-options">
-             <label for="filterType">Choose genre:</label>
-              <select id="filterType" v-model="selectedFilter">
-              <option value="genre">Genre</option>
-          
+             <label for="genreFilter">Choose genre:</label>
+              <select id="genreFilter" v-model="selectedFilter">
+                <option value="">All</option>
+                <option value="Action">Action</option>
+                <option value="Animation">Animation</option>
+                <option value="Comedy">Comedy</option>
+                <option value="Drama">Drama</option>
+                <option value="Horror">Horror</option>
+                <option value="Romance">Romance</option>
+                <option value="Sci-Fi">Sci-Fi</option>
+                <option value="Thriller">Thriller</option>
+            
               </select>
-
-     <div v-if="selectedFilter === 'genre'">
-     <select id="genreFilter" v-model="selectedGenre">
-       <option value="">All</option>
-       <option value="Action">Action</option>
-       <option value="Animation">Animation</option>
-       <option value="Comedy">Comedy</option>
-       <option value="Drama">Drama</option>
-       <option value="Horror">Horror</option>
-       <option value="Romance">Romance</option>
-       <option value="Sci-Fi">Sci-Fi</option>
-       <option value="Thriller">Thriller</option>
-     </select>
-    </div>
-  </div>
-  </div>
+    
+            </div>
+         </div>
           </div>
         </div>
      
@@ -148,6 +145,7 @@
 
       </div>
     </div>
+    <div v-else class="no-movies"> No movies added yet. <br> Add your first movie selecting the "Add new movie" option from the menu.</div>
 
     
 
@@ -181,6 +179,24 @@
 
             <p v-if="!isEditing"><strong>Other Details:</strong> {{ selectedMovie.details }}</p>
             <input v-else type="text" v-model="editedMovie.details"/>
+            <!-- Inside the modal editing section -->
+<div v-if="isEditing">
+  <label for="editPoster">Change Poster:</label>
+  <input 
+    type="file" 
+    id="editPoster" 
+    @change="handleImageUpload($event, true)" 
+    accept="image/png, image/jpeg"
+  />
+  <div v-if="editedMovie.posterPreview">
+    <h3>New Poster Preview:</h3>
+    <img 
+      :src="editedMovie.posterPreview" 
+      alt="New Poster Preview" 
+      style="max-width: 200px; margin-top: 10px;"
+    />
+  </div>
+</div>
 
             <div class="modal-buttons">
             <button v-if="!isEditing" class="edit-button" v-on:click="editMovie">Edit</button>
@@ -197,6 +213,7 @@
 
   </div>
 
+</div>
     
   </template>
 

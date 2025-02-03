@@ -1,5 +1,6 @@
 <template>
-    <div>
+    <div class="profile-b"></div>
+    <div class="all">
         <nav class="navbar">
         <div class="nav-logo">
           <img :src="logo" alt="logo" class="logo-image">
@@ -69,12 +70,10 @@
             </div>
 
             <div class="profile-action">
-                <button
-                v-if="!isEditing"
-                v-on:click="startEditing"
-                class="edit-btn">
+                <button v-if="!isEditing" v-on:click="startEditing" class="edit-btn">
                 Edit profile
                 </button>
+                <button v-if="!isEditing" class="pass-btn" v-on:click="confirmChange">Change password</button>
               <template v-else>
                     <button v-on:click="saveProfile" class="save-btn">Save</button>
                     <button v-on:click="cancelEditing" class="cancel-btn">Cancel</button>
@@ -93,10 +92,11 @@
 
 <script>
 import logo from '@/assets/logoextinsalb.png';
-import { signOut } from 'firebase/auth';
+import { signOut, sendPasswordResetEmail } from 'firebase/auth';
 import {auth} from '../firebaseConfig';
 import { getFirestore, doc, getDoc, updateDoc, collection, where, query, getCountFromServer } from 'firebase/firestore';
-import menuIcon from '../assets/menu-icon.png'
+import menuIcon from '../assets/menu-icon.png';
+//import { notify } from "@kyvg/vue3-notification";
 
 export default {
   name: 'UserProfile',
@@ -130,8 +130,30 @@ export default {
       await signOut(auth);
       console.log("User signed out");
       this.$router.push('/');
+     
     } catch (error) {
       console.error("Error signing out: ", error);
+    }
+  },
+
+  async confirmChange(){
+    const confirmation = confirm("Are you sure you want to change your password?");
+
+    if(confirmation){
+      await this.changePassword();
+    } else{
+      console.log("password change denied")
+    }
+  }, 
+
+  async changePassword(){
+    const email = this.userProfile.email;
+    try{
+      await sendPasswordResetEmail(auth, email);
+      alert('Email sent to resend password')
+    } catch(error){
+      console.error('Error sending reset email:', error);
+      alert('There was a problem in reseting your password. Please try again later');
     }
   },
 

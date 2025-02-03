@@ -22,25 +22,29 @@
 html,
 body {
   margin: 0;
-    padding: 0;
-    width: 100%;
-    min-height: 100vh;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow: auto;
 }
 
 #app {
-  width: 100%;
   min-height: 100vh;
+  width: 100%;
+  position: relative;
 }
+
 
 h1{
     font-family: "PoppinsBold";
 }
 
 .container {
-    margin: 20px auto; 
-    width: 80%; 
-    max-width: 600px; 
-    text-align: center; 
+  margin: 20px auto;
+  width: 80%;
+  max-width: 600px;
+  text-align: center;
+  position: relative;
   }
 
   .addmovieform {
@@ -137,7 +141,8 @@ h1{
     padding: 0 20px;
     width: 100%;
     max-width: 1200px;
-    margin-top: 70px;
+    margin-top: 60px;
+   margin-bottom: 30px;
   }
   
   .movie-item {
@@ -173,26 +178,28 @@ h1{
 
   .modal-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.7);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  overflow-y: auto;
   }
   
   .modal-content {
     background-color: white;
-    padding: 20px;
-    border-radius: 8px;
-    max-width: 800px;
-    width: 90%;
-    position: relative;
-    max-height: 90vh;
-    overflow-y: auto;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 800px;
+  width: 90%;
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+  margin: 20px auto;
   }
   
   .close-button {
@@ -255,21 +262,21 @@ h1{
   }
 
   .filter-btn{
-    font-family: 'PoppinsBold';
+    font-family: 'PoppinsMedium';
     cursor: pointer;
     background: none;
-    color: #417db1;
+    color: #093753;
     padding: 10px 20px;
     border: none;
     border-radius: 5px;
-    font-size: 18px;
+    font-size: 16px;
     cursor: pointer;
     width: auto;
    text-decoration: underline;
   }
 
   .filter-btn:hover {
-    color:#09324C ;
+    color:#0e4c72 ;
     background: none;
   }
 
@@ -513,4 +520,58 @@ h1{
   position: relative;
   max-height: 90vh;
   overflow-y: auto;
+}
+
+
+.background{
+  min-height: 100vh;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  z-index: -5; 
+  background: linear-gradient(to bottom, #b3c7d8, #78c7f1);
+  overflow: hidden;
+  position: fixed;
+  
+
+  &::after{
+    content: "";
+    position: absolute;
+    
+    background: linear-gradient(360deg, #2776a0, #bedff5);
+    border-radius: 50%;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    filter: blur(50px);
+    z-index: -100;
+    
+  }
+
+  &::before{
+    content: "";
+    position: fixed;
+    
+    background: linear-gradient(to bottom, #3dbcd0, #4381a3);
+    top: 0;
+   left: 0;
+    width: 100%;
+    height: 100%;
+    filter: blur(70px);
+    z-index: -100;
+  }
+}
+
+
+.no-movies{
+  font-family: 'Poppins';
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  align-self: center;
+  text-align: center;
+  margin-top: 100px;
 }

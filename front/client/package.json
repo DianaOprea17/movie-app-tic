@@ -8,11 +8,14 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@kyvg/vue3-notification": "^3.4.1",
     "axios": "^1.7.9",
     "core-js": "^3.8.3",
     "firebase": "^11.1.0",
     "vue": "^3.2.13",
     "vue-router": "^4.5.0",
+    "vue3-notification": "^0.0.3",
+    "vue3-slider": "^1.10.1",
     "vuex": "^4.0.2"
   },
   "devDependencies": {
