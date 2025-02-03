@@ -82,6 +82,7 @@ app.post('/add-movie', upload.single('poster'), async (req, res) => {
   }
 });
 
+
 app.get('/user/:uid', async (req, res) => {
   const uid = req.params.uid;
   try {
@@ -172,7 +173,7 @@ app.delete("/movies/:id", async (req, res) => {
       try {
         const bucket = storage.bucket();
         
-        const url = new URL(movieData.posterURL);
+        const url = movieData.posterURL;
         const decodeURL = decodeURIComponent(url);
         const filePath = decodeURL.split('/o/')[1].split('?')[0];
         

@@ -272,3 +272,60 @@ h2 {
     color: #4376a2;
   }
 
+  /*responsive*/
+
+  @media (max-width: 760px) {
+    .login-container {
+      flex-direction: column; 
+      align-items: center;
+      justify-content: flex-start;
+      height: auto;
+      padding-bottom: 50px;
+    }
+  
+    .left-side {
+      order: 1; 
+      width: 100%;
+      margin-bottom: 20px;
+      margin-left: 50px;
+    }
+  
+    .login-form {
+      order: 2; 
+      width: 90%;
+      margin: 0;
+    }
+  
+    .logo {
+      width: 200px; 
+      margin-top: 20px;
+    }
+  
+    .welcome-text h1 {
+      font-size: 18px; 
+    }
+  
+    .welcome-text p {
+      font-size: 14px; 
+    }
+  }
+  
+  @media (max-width: 450px) {
+    .login-form {
+      width: 95%;
+      padding: 20px;
+    }
+  
+    .login-btn {
+      font-size: 16px;
+    }
+  
+    .input-group input {
+      padding: 8px;
+    }
+  
+    .error-message {
+      font-size: 14px;
+    }
+  }
+

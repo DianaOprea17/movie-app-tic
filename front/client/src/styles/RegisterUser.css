@@ -170,3 +170,62 @@ html, body {
     font-size: 15px;
     color: white;
   }
+
+  /*responsive*/
+
+  @media (max-width: 760px) {
+    .signup {
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      height: auto;
+      padding-bottom: 30px;
+    }
+  
+    .left-side {
+      order: 1;
+      width: 100%;
+      margin-bottom: 20px;
+    }
+  
+    .signup-container {
+      order: 2;
+      width: 90%;
+      margin: 0;
+      margin-bottom: 50px; 
+    }
+  
+    .logo {
+      width: 200px;
+    }
+  
+    .welcome-text h1 {
+      font-size: 18px;
+    }
+  
+    .welcome-text p {
+      font-size: 14px;
+    }
+  }
+  
+ 
+  @media (max-width: 450px) {
+    .signup-container {
+      width: 95%;
+      padding: 20px;
+      margin-bottom: 40px; 
+    }
+  
+    .signup-btn {
+      font-size: 18px;
+    }
+  
+    .input-group input {
+      padding: 8px;
+    }
+  
+    .error-message {
+      font-size: 14px;
+    }
+  }
+  

@@ -179,24 +179,24 @@
 
             <p v-if="!isEditing"><strong>Other Details:</strong> {{ selectedMovie.details }}</p>
             <input v-else type="text" v-model="editedMovie.details"/>
-            <!-- Inside the modal editing section -->
-<div v-if="isEditing">
-  <label for="editPoster">Change Poster:</label>
-  <input 
-    type="file" 
-    id="editPoster" 
-    @change="handleImageUpload($event, true)" 
-    accept="image/png, image/jpeg"
-  />
-  <div v-if="editedMovie.posterPreview">
-    <h3>New Poster Preview:</h3>
-    <img 
-      :src="editedMovie.posterPreview" 
-      alt="New Poster Preview" 
-      style="max-width: 200px; margin-top: 10px;"
-    />
-  </div>
-</div>
+            
+          <div v-if="isEditing">
+            <label for="editPoster">Change Poster:</label>
+              <input 
+                type="file" 
+                id="editPoster" 
+                @change="handleImageUpload($event, true)" 
+                accept="image/png, image/jpeg"
+                />
+            <div v-if="editedMovie.posterPreview">
+                <h3>New Poster Preview:</h3>
+                <img 
+                :src="editedMovie.posterPreview" 
+               alt="New Poster Preview" 
+                style="max-width: 200px; margin-top: 10px;"
+                />
+               </div>
+          </div>
 
             <div class="modal-buttons">
             <button v-if="!isEditing" class="edit-button" v-on:click="editMovie">Edit</button>
