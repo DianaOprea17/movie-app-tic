@@ -159,6 +159,7 @@ export default {
 
   //preia datele din firebase
   async fetchUserProfile() {
+    
       try {
         const user = auth.currentUser;
         if (user) {
@@ -206,18 +207,31 @@ export default {
       this.isEditing = false;
     },
 
-    fetchUserName() {
+    async fetchUserName() {
       const user = auth.currentUser;
-
-     if (user) {
-         fetch(`http://localhost:3000/user/${user.uid}`).then(response => response.json())
-            .then(data => {
-               console.log('User data fetched:', data);
-               this.username = data.firstName;
-              }).catch(error => {
-                console.error('Error fetching user:', error);
-                });
-  }
+      if (user) {
+        const token = await user.getIdToken(); 
+    
+        fetch(`http://localhost:3000/user/${user.uid}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`, 
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.log('User data fetched:', data);
+          this.username = data.firstName;
+        })
+        .catch(error => {
+          console.error('Error fetching user:', error);
+        });
+      }
     },
 
     toggleMenu(event) {

@@ -31,8 +31,8 @@ app.use(cors({
 app.use(express.json());
 
 
-const verifyToken = async (req, res, next) => {
-  const idToken = req.headers.authorization?.split('Bearer ')[1];
+async function verifyToken(req, res, next) {
+  const idToken = req.headers.authorization?.split(' ')[1];
   if (!idToken) {
     return res.status(403).send('Unauthorized');
   }
@@ -83,9 +83,15 @@ app.post('/add-movie', upload.single('poster'), async (req, res) => {
 });
 
 
-app.get('/user/:uid', async (req, res) => {
-  const uid = req.params.uid;
+app.get('/user/:uid', verifyToken, async (req, res) => {
+  
   try {
+    const uid = req.params.uid;
+    const userDoc = await db.collection('users').doc(uid).get();
+    if (!userDoc.exists) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
     const docRef = db.collection('users').doc(uid);
     const docData = await docRef.get();
 
@@ -128,10 +134,10 @@ app.post('/login', async (req, res) => {
   }
 });
 
-app.get('/movies', async (req, res) => {
+app.get('/movies', verifyToken, async (req, res) => {
   try {
     const userEmail = req.query.userEmail;
-    let moviesQuery = db.collection('movies');
+    let moviesQuery = db.collection('movies').where('user.email', '==', userEmail);
 
     if(userEmail){
       moviesQuery = moviesQuery.where('user.email','==', userEmail);
@@ -156,7 +162,7 @@ app.get('/movies', async (req, res) => {
   }
 });
 
-app.delete("/movies/:id", async (req, res) => {
+app.delete("/movies/:id", verifyToken, async (req, res) => {
   const movieId = req.params.id;
   
   try {
@@ -168,6 +174,10 @@ app.delete("/movies/:id", async (req, res) => {
     }
 
     const movieData = doc.data();
+
+    if (movieData.user.email !== req.user.email) {
+      return res.status(403).json({ error: "Unauthorized access" });
+    }
     
     if (movieData.posterURL) {
       try {
@@ -191,7 +201,6 @@ app.delete("/movies/:id", async (req, res) => {
       }
     }
 
-
     await movieRef.delete();
     
     res.status(200).json({ message: "Movie and poster deleted successfully" });
@@ -204,6 +213,7 @@ app.delete("/movies/:id", async (req, res) => {
     });
   }
 });
+
 
 
 app.get('/register', (req, res) => {

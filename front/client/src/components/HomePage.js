@@ -108,18 +108,31 @@ export default {
       }
     },
 
-    fetchUserName() {
+    async fetchUserName() {
       const user = auth.currentUser;
-
-     if (user) {
-         fetch(`http://localhost:3000/user/${user.uid}`).then(response => response.json())
-            .then(data => {
-               console.log('User data fetched:', data);
-               this.username = data.firstName;
-             }).catch(error => {
-                console.error('Error fetching user:', error);
-                });
-  }
+      if (user) {
+        const token = await user.getIdToken(); 
+    
+        fetch(`http://localhost:3000/user/${user.uid}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`, 
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.log('User data fetched:', data);
+          this.username = data.firstName;
+        })
+        .catch(error => {
+          console.error('Error fetching user:', error);
+        });
+      }
     },
 
   async addMovie(){
@@ -198,7 +211,13 @@ export default {
           return;
         }
 
-        const response = await fetch(`http://localhost:3000/movies?userEmail=${encodeURIComponent(user.email)}`);
+        const token = await user.getIdToken();
+        const response = await fetch(`http://localhost:3000/movies?userEmail=${encodeURIComponent(user.email)}`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
 
         if (!response.ok) {
           throw new Error('Network response was not ok');
@@ -317,10 +336,19 @@ export default {
 
       console.log("Attempting to delete movie with ID:", this.selectedMovie.id);
 
+      const user = auth.currentUser;
+      if (!user) {
+          console.log('No user logged in');
+          return;
+      }
+
+      const token = await user.getIdToken();
+
       const response = await fetch(`http://localhost:3000/movies/${this.selectedMovie.id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         }
       });
 
@@ -420,7 +448,7 @@ export default {
 
   },
 
-  beforeUnount() {
+  beforeUnmount() {
     document.removeEventListener('click', this.closeMenu);
   },
 
